@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/dxpb/dxpb/internal/github"
+	"github.com/dxpb/dxpb/internal/http"
 	"github.com/dxpb/dxpb/internal/irc"
-	"github.com/dxpb/dxpb/internal/webhook_target"
 )
 
 func main() {
@@ -16,11 +17,22 @@ func main() {
 		log.Panic(err)
 	}
 
+	web, err := http.New()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	gitEvent := make(chan github.Commit)
+	gh, err := github.New(gitEvent)
+	if err != nil {
+		log.Panic(err)
+	}
+	web.RegisterGinHook("/ghwebhook", "POST", gh.WebHook)
+
 	log.Println("Connecting to IRC")
 	go ircClient.Connect()
 
-	gitEvent := make(chan webhook_target.Event)
-	go webhook_target.GithubListener(gitEvent)
+	go web.Serve()
 	for {
 		select {
 		case event := <-gitEvent:
