@@ -125,7 +125,7 @@ func connectDrone(ctx context.Context, url string, alias string, info builderInf
 func RunPool(jobqueue <-chan BuildJob, foreigners map[string]string) {
 	ctx := context.Background()
 	builders := make(map[string]builderInfo)
-	for alias, _ := range foreigners {
+	for alias := range foreigners {
 		b := *new(builderInfo)
 		b.ret = make(chan buildUpdate)
 		b.req = make(chan BuildJob)
