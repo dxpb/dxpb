@@ -30,8 +30,8 @@ func connectDrone(ctx context.Context, url string, alias string, info builderInf
 
 	for {
 		time.Sleep(backoff * time.Second) // Prevent hammering.
-		if backoff > 120 {
-			backoff = backoff
+		if backoff >= 120 {
+			backoff = 120
 		} else {
 			backoff = (backoff + 1) * 3
 		}
